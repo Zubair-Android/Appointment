@@ -1,10 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/navigation"
-    app:startDestination="@id/appointmentListFragment">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation"
+    app:startDestination="@id/appointmentCalendar">
 
+
+    <fragment
+        android:id="@+id/appointmentCalendar"
+        android:name="com.example.appointment.fragment.AppointmentCalendar"
+        android:label="fragment_appointment_calendar"
+        tools:layout="@layout/fragment_appointment_calendar">
+        <action
+            android:id="@+id/action_appointmentCalendar_to_appointmentListFragment"
+            app:destination="@id/appointmentListFragment" />
+    </fragment>
     <fragment
         android:id="@+id/appointmentListFragment"
         android:name="com.example.appointment.fragment.AppointmentListFragment"
-        android:label="AppointmentListFragment" />
+        android:label="AppointmentListFragment"
+        tools:layout="@layout/fragment_appointment_list"/>
+    <fragment
+        android:id="@+id/appointmentOption"
+        android:name="com.example.appointment.fragment.AppointmentOption"
+        android:label="AppointmentOption"
+        tools:layout="@layout/fragment_appointmentoption"/>
+    <activity
+        android:id="@+id/spleshActivity"
+        android:name="com.example.appointment.SpleshActivity"
+        android:label="activity_splesh"
+        tools:layout="@layout/activity_splesh" />
+
 </navigation>

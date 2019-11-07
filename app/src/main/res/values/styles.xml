@@ -7,5 +7,10 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
+    <style name="SpleshThem" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimaryDark">@color/splash</item>
+        <item name="colorAccent">@color/colorAccent</item>
+
+    </style>
 
 </resources>

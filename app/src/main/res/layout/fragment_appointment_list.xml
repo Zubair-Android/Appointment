@@ -3,33 +3,63 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
-    <data>
-        <variable
-            name="appointListViewModel"
-            type="com.example.appointment.fragment.AppointmentListFragment" />
-    </data>
 
+    <androidx.constraintlayout.widget.ConstraintLayout
 
-
-<androidx.constraintlayout.widget.ConstraintLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".fragment.AppointmentListFragment">
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_appoint"
+        android:id="@+id/constraintlayoutMainActivity"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clipToPadding="false"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:listData="@{appointListViewModel.properties}"
+        android:background="@color/layoutBgcolor"
+        tools:context=".fragment.AppointmentListFragment">
 
-        tools:listitem="@layout/appointment_list_item" />
+        <ProgressBar
+            android:id="@+id/tokenProgressbar"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:indeterminate="true"
+            android:indeterminateTint="@color/colorToken"
+            android:indeterminateBehavior="cycle"
+            app:layout_constraintHeight_percent=".2"
+            app:layout_constraintWidth_percent=".3"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/rv_appoint" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_appoint"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0"
+            app:spanCount="2"
+            tools:listitem="@layout/appointment_list_item">
+
+        </androidx.recyclerview.widget.RecyclerView>
+
+        <Button
+            android:id="@+id/bt_insert_new_record"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/plus"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.95"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/rv_appoint"
+            app:layout_constraintVertical_bias="0.97"
+            app:layout_constraintWidth_percent=".2"
+            app:layout_constraintHeight_percent=".13"
+            />
 
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

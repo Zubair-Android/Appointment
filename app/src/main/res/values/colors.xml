@@ -3,4 +3,8 @@
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
+    <color name="colorToken">#FFFFFF</color>
+    <color name="layoutBgcolor">#7533F533</color>
+    <color name="viewGroupBgColor">#E8E9F0E9</color>
+    <color name="splash">#D81B60</color>
 </resources>
