@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+<LinearLayout
+
+    android:id="@+id/linearLayoutAppointmentCalender"
+    android:background="@color/layoutBgcolor"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragment.AppointmentCalendar">
+
+
+    <TextView
+        android:id="@+id/titleCalender"
+        android:layout_margin="10dp"
+        android:layout_gravity="center"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/appointmentCalender" />
+
+    <CalendarView
+        android:id="@+id/calendarView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minDate="@string/minDate"
+        android:maxDate="@string/mixDate"
+        android:layout_gravity="center"
+        android:layout_margin="10dp"
+        android:background="@color/viewGroupBgColor"
+        tools:layout_editor_absoluteX="30dp"
+        tools:layout_editor_absoluteY="101dp" />
+
+</LinearLayout>
+</layout>
