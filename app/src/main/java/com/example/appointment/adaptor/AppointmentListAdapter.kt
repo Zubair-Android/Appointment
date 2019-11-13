@@ -1,33 +1,22 @@
 package com.example.appointment.adaptor
 
-import android.app.Activity
-import android.app.LauncherActivity
-import android.content.ContentProvider
-import android.content.ContentProviderClient
-import android.content.Context
-import android.nfc.Tag
 import android.util.Log
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
 import androidx.constraintlayout.widget.Constraints.TAG
 import androidx.recyclerview.widget.RecyclerView
 import com.example.appointment.R
-import com.example.appointment.fragment.AppointmentListFragment
 import com.example.appointment.network.User
-import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.Timestamp
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Source
 import kotlinx.android.synthetic.main.appointment_list_item.view.*
-import kotlinx.android.synthetic.main.fragment_appointment_list.*
-import java.text.SimpleDateFormat
-import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 
-class AppointmentListAdapter (val appointList : List<String?>,
+class AppointmentListAdapter (val appointList : ArrayList<String>,
                               val listner:AppointmentClickListener,
                               val formated:String): RecyclerView.Adapter<AppointmentListViewHolder>() {
 
@@ -40,17 +29,29 @@ class AppointmentListAdapter (val appointList : List<String?>,
         return appointList.size
     }
 
-    override fun onBindViewHolder(holder: AppointmentListViewHolder, position: Int) {
+      override fun onBindViewHolder(holder: AppointmentListViewHolder, position: Int){
         holder.nameList.text = appointList[position]
 
         holder.wholeView.setOnClickListener {
-            val db = FirebaseFirestore.getInstance();
+            val db = FirebaseFirestore.getInstance()
             val tokenRef = db.collection("doctor").document(formated).collection("Token");
-            val token = appointList[position]
-            tokenRef.document(token!!)
+            val token = appointList.get(position)
+            tokenRef.document(token)
                 .get().addOnSuccessListener { document ->
 
-                    val user = document.toObject(User::class.java)
+                    val data = document.data ?: return@addOnSuccessListener
+                   val userData =  data[token] as HashMap<String, Any>
+
+                    val mobile = userData["mobile"] as String
+
+                    val name = userData["name"] as String
+
+                    val token = userData["token"] as String
+
+                    val user = User(name, mobile, token)
+
+                    val time = data["time"] as Timestamp
+
 
                     listner.onDocumentClicked(user!!)
                     Log.d(TAG, "Appointment token is ${document.id} data is ${document.data} ")
@@ -60,9 +61,7 @@ class AppointmentListAdapter (val appointList : List<String?>,
 
         }
 
-
-
-    }
+}
 class AppointmentListViewHolder(view: View): RecyclerView.ViewHolder(view){
 
     val nameList = view.tv_tokenNumber

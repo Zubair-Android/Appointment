@@ -22,6 +22,7 @@ import androidx.constraintlayout.widget.Constraints.TAG
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.text.isDigitsOnly
+import androidx.core.util.rangeTo
 import androidx.core.view.isInvisible
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
@@ -32,7 +33,11 @@ import com.example.appointment.adaptor.AppointmentClickListener
 import com.example.appointment.adaptor.AppointmentListAdapter
 import com.example.appointment.databinding.FragmentAppointmentListBinding
 import com.example.appointment.network.User
+import com.google.firebase.database.collection.ArraySortedMap
 import com.google.firebase.firestore.*
+import com.google.firebase.firestore.FieldValue.serverTimestamp
+import com.google.firestore.v1.StructuredQuery
+import io.grpc.Server
 import io.opencensus.metrics.export.Summary
 import kotlinx.android.synthetic.main.appointment_list_item.*
 import kotlinx.android.synthetic.main.fragment_appointment_list.*
@@ -41,6 +46,8 @@ import kotlinx.android.synthetic.main.popupwinow.*
 import java.io.DataInput
 import java.lang.Exception
 import java.sql.Date
+import java.sql.Time
+import java.sql.Timestamp
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.time.DayOfWeek
@@ -52,9 +59,7 @@ import kotlin.collections.HashMap
 import kotlin.collections.emptyList as emptyList1
 
 class AppointmentListFragment : Fragment()  {
-    private var formated: String? = null
     private val PERMISSION_REQUEST_CODE = 1
-
     private var constraintLayout : ConstraintLayout ? = null
 
 
@@ -63,12 +68,7 @@ class AppointmentListFragment : Fragment()  {
         savedInstanceState: Bundle?
     ): View? {
         val binding = FragmentAppointmentListBinding.inflate(inflater)
-
-         formated = arguments?.getString("selectedDate")
-        val tokenRef = FirebaseFirestore.getInstance().collection("doctor").document(formated.toString()).collection("Token");
-
         binding.rvAppoint.layoutManager = GridLayoutManager(context,2);
-
             retrivedocumentid()
 
         constraintLayout= constraintLayout?.findViewById<ConstraintLayout>(R.id.constraintlayoutMainActivity)
@@ -125,9 +125,119 @@ class AppointmentListFragment : Fragment()  {
 
     }
 
+        //========== testing phase step 1===========
+    /*fun retrivedocumentid(){
+            val  formated = arguments?.getString("selectedDate");
+            val db = FirebaseFirestore.getInstance();
+            val doctorRef = db.collection("doctor");
+            val dateRef = doctorRef.document(formated.toString());
+
+            val tokenRef = dateRef.collection("Token");
 
 
-    fun retrivedocumentid(){
+
+            dateRef.get().addOnSuccessListener {snap ->
+                val list = ArrayList<String>()
+
+
+                 snap.data?.toSortedMap()?.forEach{mapentry->
+                     list.add(mapentry.key)
+
+                }
+
+
+
+
+            *//*val AppTimeFire = ""
+            val list = ArrayList<String>()
+                tokenRef.get().addOnSuccessListener {querySnap ->
+                querySnap.documents.forEach {docSnap ->
+                    list.add(docSnap.id)
+
+
+
+
+                }
+
+
+            }*//*
+
+//        doctorRef.orderBy("time",Query.Direction.ASCENDING)
+//            .get()
+//            .addOnSuccessListener { QuerySnap->
+//                val list = ArrayList<String>()
+//                QuerySnap.documents.forEach { DocSnap->
+//                    DocSnap.data?.forEach {fieldMap->
+//                        fieldMap.key.forEach {fielkeychar->
+//
+//                        }
+//
+//
+//
+//                    }
+//                }
+//
+//                Log.d(TAG,"field list is ${list}")
+
+
+
+                *//*val sortedUsers = snap.documents.map {documents ->
+                    documents.toObject(User::class.java)
+                }.sortedBy {user ->
+                    user?.userToken
+                }.map { user ->
+                    user?.token
+                }*//*
+
+
+
+//               // Log.d(TAG,"users ${sortedUsers}")
+                tokenProgressbar.isInvisible = true
+               // Toast.makeText(context,"documetn on = ${sortedUsers}",Toast.LENGTH_SHORT).show()
+
+
+                rv_appoint.adapter = AppointmentListAdapter(list, object:AppointmentClickListener{
+                    override fun onDocumentClicked(user: User) {
+
+                        val inflater = context?.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                        val view = inflater.inflate(R.layout.viewpatientdetail,null)
+                        val popupViewWindow =PopupWindow(view,600,800)
+                        popupViewWindow.showAtLocation(constraintlayoutMainActivity, Gravity.CENTER,0,0)
+                        val viewClose = view.findViewById<Button>(R.id.viewClose)
+                        val appName = view.findViewById<TextView>(R.id.appsName)
+                        val viewDate = view.findViewById<TextView>(R.id.viewDate)
+                        val patientName = view.findViewById<TextView>(R.id.patientName)
+                        val patientNumber = view.findViewById<TextView>(R.id.patientNumber)
+                        val tokenNumber = view.findViewById<TextView>(R.id.tokenNumber)
+
+
+                        appName.text = "Clinical Appointment"
+                        viewDate.text = ""
+
+                        patientName.text = user.name
+                        patientNumber.text = user.mobile
+                        tokenNumber.text = user.token.toString()
+
+                        viewClose.setOnClickListener(View.OnClickListener {
+                            popupViewWindow.dismiss()
+                        })
+
+                    }
+
+                },formated!!)
+                Toast.makeText(context,"Totel issued Token  ${list.size}",Toast.LENGTH_LONG).show()
+
+            }
+            .addOnFailureListener {e->
+                Log.i("Appointment", "data fetching failed with ${e.message}")
+
+                Toast.makeText(context, "failed", Toast.LENGTH_LONG).show()
+            }
+
+    }*/
+    //===============end testing step 1 ===============
+    //============ WOrking fine 11:52 , 8/11/19 step 1======
+     /*fun retrivedocumentid(){
 
          formated = arguments?.getString("selectedDate")
         val tokenRef = FirebaseFirestore.getInstance()
@@ -230,8 +340,11 @@ class AppointmentListFragment : Fragment()  {
     }
 
     fun popupForm() {
-       val  formated = arguments?.getString("selectedDate")
-        val tokenRef = FirebaseFirestore.getInstance().collection("doctor").document(formated.toString()).collection("Token")
+       val  formated = arguments?.getString("selectedDate");
+        val db = FirebaseFirestore.getInstance();
+        val doctorRef = db.collection("doctor");
+        val dateRef = doctorRef.document(formated.toString());
+        val tokenRef = dateRef.collection("Token");
 
         val inflater =
             context?.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
@@ -249,41 +362,242 @@ class AppointmentListFragment : Fragment()  {
         })
         btnSubmit?.setOnClickListener(View.OnClickListener {
 
+                    val nameEditText = view.findViewById<EditText>(R.id.paitnt_name_textInput)
+                    val numberEditText = view.findViewById<EditText>(R.id.patient_number_editText)
 
-            val nameEditText = view.findViewById<EditText>(R.id.paitnt_name_textInput)
-            val numberEditText = view.findViewById<EditText>(R.id.patient_number_editText)
-
-            val Name = nameEditText.text.toString()
-            val Mobile = numberEditText.text.toString()
-
-            tokenRef.get()
-                .addOnSuccessListener {
-                    val i: Int = it.documents.size
-                    val user = User(Name,Mobile,i.inc().toString())
-                    tokenRef.document(i.inc().toString()).set(user)
-                    val patientDetail =
-                        "Skin care\nToken no : ${i.inc()}\n Date : ${formated}\n Patient Name : ${Name}\n Mobile : ${Mobile}\n"
-                    sendText(Mobile, patientDetail)
-                    Toast.makeText(
-                        context,
-                        "Successfully inserted Token # ${i.inc()}",
-                        Toast.LENGTH_LONG
-                    ).show()
-                    retrivedocumentid()
-
-                }
-
-                .addOnFailureListener { e ->
+                    val Name = nameEditText.text.toString()
+                    val Mobile = numberEditText.text.toString()
+                    val timestamp = serverTimestamp();
 
 
-                    Toast.makeText(context, "failed", Toast.LENGTH_LONG).show()
-                }
-            popupWindow.dismiss()
+                    tokenRef.get()
+                        .addOnSuccessListener {
+                            val documentSize: Int = it.documents.size
+                            val user = User(Name, Mobile, documentSize.inc().toString(), timestamp)
+                            tokenRef.document(documentSize.inc().toString()).set(user)
+                            val patientDetail =
+                                "Skin care\nToken no : ${documentSize.inc()}\n Date : ${formated}\n Patient Name : ${Name}\n Mobile : ${Mobile}\n"
+                          //  sendText(Mobile, patientDetail)
+                            Toast.makeText(
+                                context,
+                                "Successfully inserted Token # ${documentSize.inc()}",
+                                Toast.LENGTH_LONG
+                            ).show()
+                            /*retrivedocumentid()*/
+
+                        }
+
+                        .addOnFailureListener { e ->
+
+
+                            Toast.makeText(context, "failed", Toast.LENGTH_LONG).show()
+                        }
+
 
 
         })
 
     }
+    */
+    //===========end step 1 =================================
+    //============  start step 2 custom data put in field successfully ==========
+    /*fun popupForm() {
+       val  formated = arguments?.getString("selectedDate");
+        val db = FirebaseFirestore.getInstance();
+        val doctorRef = db.collection("doctor");
+        val dateRef = doctorRef.document(formated.toString());
+        val tokenRef = dateRef.collection("Token");
+
+        val inflater =
+            context?.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val view = inflater.inflate(R.layout.popupwinow, null)
+        val popupWindow =
+            PopupWindow(view, 750, ConstraintLayout.LayoutParams.WRAP_CONTENT, true)
+        popupWindow.showAtLocation(constraintlayoutMainActivity, Gravity.CENTER, 0, 0)
+
+        val btnSubmit = view?.findViewById<Button>(R.id.btn_submit)
+        val btnClose = view?.findViewById<Button>(R.id.btn_close)
+
+        btnClose?.setOnClickListener(View.OnClickListener {
+            Toast.makeText(context, "close btn click listener", Toast.LENGTH_LONG).show()
+            popupWindow.dismiss()
+        })
+        btnSubmit?.setOnClickListener(View.OnClickListener {
+
+                    val nameEditText = view.findViewById<EditText>(R.id.paitnt_name_textInput)
+                    val numberEditText = view.findViewById<EditText>(R.id.patient_number_editText)
+
+                    val Name = nameEditText.text.toString()
+                    val Mobile = numberEditText.text.toString()
+                    val timestamp = serverTimestamp();
+
+
+                    dateRef.get()
+                        .addOnSuccessListener {docSnap->
+                            val docInc :Int
+                            val documentSize = docSnap.data?.size
+                            if (documentSize == null){
+                                 docInc = 1
+                            }else{
+                                 docInc = documentSize.inc()
+                            }
+
+
+                            val user = User(Name, Mobile, docInc.toString(), timestamp)
+                            val userHahmap = HashMap<String,Any>()
+                            userHahmap.put(docInc.toString(),user)
+
+                            doctorRef.document().set(userHahmap, SetOptions.merge())
+                            popupWindow.dismiss()
+                            val patientDetail =
+                                "Skin care\nToken no : ${documentSize}\n Date : ${formated}\n Patient Name : ${Name}\n Mobile : ${Mobile}\n"
+                          //  sendText(Mobile, patientDetail)
+                            Toast.makeText(
+                                context,
+                                "Successfully inserted Token # ${docInc}",
+                                Toast.LENGTH_LONG
+                            ).show()
+                            retrivedocumentid()
+
+                        }
+
+                        .addOnFailureListener { e ->
+
+
+                            Toast.makeText(context, "failed", Toast.LENGTH_LONG).show()
+                        }
+
+
+
+        })
+
+    }*/ // data set by custom
+    //============ end step 2 custom data put in field successfully ==========
+
+    fun retrivedocumentid(){
+        val  formated = arguments?.getString("selectedDate");
+        val db = FirebaseFirestore.getInstance();
+        val tokenRef = db.collection("doctor").document(formated.toString()).collection("Token")
+
+        tokenRef.orderBy("time",Query.Direction.ASCENDING)
+            .get().addOnSuccessListener {
+                val list = ArrayList<String>()
+                it.documents.forEach {document->
+                    list.add(document.id)
+                }
+
+
+                tokenProgressbar.isInvisible = true
+                rv_appoint.adapter = AppointmentListAdapter(list, object:AppointmentClickListener{
+                    override fun onDocumentClicked(user: User) {
+
+                        val inflater = context?.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                        val view = inflater.inflate(R.layout.viewpatientdetail,null)
+                        val popupViewWindow =PopupWindow(view,600,800)
+                        popupViewWindow.showAtLocation(constraintlayoutMainActivity, Gravity.CENTER,0,0)
+                        val viewClose = view.findViewById<Button>(R.id.viewClose)
+                        val appName = view.findViewById<TextView>(R.id.appsName)
+                        val viewDate = view.findViewById<TextView>(R.id.viewDate)
+                        val patientName = view.findViewById<TextView>(R.id.patientName)
+                        val patientNumber = view.findViewById<TextView>(R.id.patientNumber)
+                        val tokenNumber = view.findViewById<TextView>(R.id.tokenNumber)
+
+
+                        appName.text = "Clinical Appointment"
+                        viewDate.text = formated
+
+                        patientName.text = user.name
+                        patientNumber.text = user.mobile
+                        tokenNumber.text = user.token.toString()
+
+                        viewClose.setOnClickListener(View.OnClickListener {
+                            popupViewWindow.dismiss()
+                        })
+
+                    }
+
+                },formated!!)
+                Toast.makeText(context,"Totel issued Token ",Toast.LENGTH_LONG).show()
+
+
+            }
+
+
+    }
+
+    fun popupForm() {
+           val  formated = arguments?.getString("selectedDate");
+            val db = FirebaseFirestore.getInstance();
+            val doctorRef = db.collection("doctor");
+            val dateRef = doctorRef.document(formated.toString());
+            val tokenRef = dateRef.collection("Token");
+
+            val inflater =
+                context?.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+            val view = inflater.inflate(R.layout.popupwinow, null)
+            val popupWindow =
+                PopupWindow(view, 750, ConstraintLayout.LayoutParams.WRAP_CONTENT, true)
+            popupWindow.showAtLocation(constraintlayoutMainActivity, Gravity.CENTER, 0, 0)
+
+            val btnSubmit = view?.findViewById<Button>(R.id.btn_submit)
+            val btnClose = view?.findViewById<Button>(R.id.btn_close)
+
+            btnClose?.setOnClickListener(View.OnClickListener {
+                Toast.makeText(context, "close btn click listener", Toast.LENGTH_LONG).show()
+                popupWindow.dismiss()
+            })
+            btnSubmit?.setOnClickListener(View.OnClickListener {
+
+                        val nameEditText = view.findViewById<EditText>(R.id.paitnt_name_textInput)
+                        val numberEditText = view.findViewById<EditText>(R.id.patient_number_editText)
+
+                        val Name = nameEditText.text.toString()
+                        val Mobile = numberEditText.text.toString()
+                        val timestamp = serverTimestamp()
+
+
+                        tokenRef.get()
+                            .addOnSuccessListener {QuerySnap->
+                                val docInc :Int
+                                val documentSize = QuerySnap.size()
+                                if (documentSize == null){
+                                     docInc = 1
+                                }else{
+                                     docInc = documentSize.inc()
+                                }
+
+
+                                val user = User(Name, Mobile, docInc.toString())
+                                val userHahmap = HashMap<String,Any>()
+                                userHahmap.put(docInc.toString(),user)
+                                userHahmap.put("time",timestamp)
+
+                                tokenRef.document(docInc.toString()).set(userHahmap)
+                                popupWindow.dismiss()
+
+                                val patientDetail =
+                                    "Skin care\nToken no : ${documentSize}\n Date : ${formated}\n Patient Name : ${Name}\n Mobile : ${Mobile}\n"
+                              //  sendText(Mobile, patientDetail)
+                                Toast.makeText(
+                                    context,
+                                    "Successfully inserted Token # ${docInc}",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                                retrivedocumentid()
+
+                            }
+
+                            .addOnFailureListener { e ->
+
+
+                                Toast.makeText(context, "failed", Toast.LENGTH_LONG).show()
+                            }
+
+
+
+            })
+
+        }
 }
 
 
